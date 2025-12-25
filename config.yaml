@@ -1,0 +1,177 @@
+# Knowledge Retrieval Service Configuration
+
+# 服务配置
+service:
+  name: "knowledge-retrieval-service"
+  version: "1.0.0"
+  debug: true
+  host: "0.0.0.0"
+  port: 8000
+
+# 嵌入模型配置
+embedding:
+  provider: "huggingface"  # 选项: huggingface, openai, cohere
+  # 使用 CLIP 模型支持文本和图片
+  model_name: "openai/clip-vit-base-patch32"
+  dimension: 512
+  batch_size: 32
+  device: "cpu"  # cpu 或 cuda，使用 mps 可启用 Apple Silicon GPU
+  
+  # 不同文件类型的模型配置
+  models:
+    image:
+      provider: "huggingface"
+      model_name: "openai/clip-vit-base-patch32"
+      dimension: 512
+    text:
+      provider: "huggingface"
+      model_name: "sentence-transformers/all-MiniLM-L6-v2"
+      dimension: 384
+    audio:
+      provider: "huggingface"
+      model_name: "facebook/wav2vec2-base-960h"
+      dimension: 768
+    video:
+      provider: "huggingface"
+      model_name: "openai/clip-vit-base-patch32"
+      dimension: 512
+      frame_sample_rate: 1  # 每秒采样帧数
+
+# 向量数据库配置
+vector_db:
+  provider: "chroma"  # 选项: chroma, milvus, qdrant, faiss
+  
+  # ChromaDB 配置
+  chroma:
+    persist_directory: "./data/chroma"
+    collection_name: "knowledge_base"
+    
+  # Milvus 配置
+  milvus:
+    host: "localhost"
+    port: 19530
+    collection_name: "knowledge_base"
+    index_type: "IVF_FLAT"
+    metric_type: "L2"
+    nlist: 1024
+    
+  # Qdrant 配置
+  qdrant:
+    host: "localhost"
+    port: 6333
+    collection_name: "knowledge_base"
+    distance: "Cosine"
+    
+  # FAISS 配置
+  faiss:
+    index_path: "./data/faiss/index"
+    index_type: "IndexFlatL2"  # IndexFlatL2, IndexIVFFlat, IndexHNSW
+
+# 检索配置
+retrieval:
+  default_top_k: 50
+  max_top_k: 100
+  min_top_k: 1
+  similarity_threshold: 0.03  # 3%阈值，过滤极低相关度结果
+  enable_reranking: false
+  enable_hybrid: true
+  hybrid_alpha: 0.2  # 降低向量权重，提高BM25权重（0.2向量+0.8BM25）
+  enable_multi_path: true  # 启用多路召回
+
+# 文件处理配置
+file_processing:
+  upload_dir: "./data/uploads"
+  max_file_size: 104857600  # 100MB in bytes
+  allowed_extensions:
+    image: [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"]
+    document: [".pdf", ".docx", ".doc", ".txt", ".md"]
+    video: [".mp4", ".avi", ".mov", ".mkv", ".flv"]
+    audio: [".mp3", ".wav", ".m4a", ".aac", ".flac", ".ogg"]
+  
+  # 图片处理
+  image:
+    max_dimension: 1024
+    thumbnail_size: 256
+    
+  # 文档处理
+  document:
+    chunk_size: 512
+    chunk_overlap: 50
+    
+  # 视频处理
+  video:
+    frame_interval: 30  # 每30帧提取一帧
+    max_frames: 100
+    
+  # 音频处理
+  audio:
+    sample_rate: 16000
+    max_duration: 600  # 10分钟（秒）
+    model_size: "base"  # Whisper模型大小: tiny, base, small, medium, large
+    language: "zh"  # 语言代码: zh=中文, en=英文
+
+# 数据库配置 (存储元数据)
+database:
+  type: "sqlite"  # sqlite, postgresql, mysql
+  sqlite:
+    path: "./data/metadata.db"
+  postgresql:
+    host: "localhost"
+    port: 5432
+    database: "knowledge_db"
+    user: "postgres"
+    password: "password"
+  mysql:
+    host: "localhost"
+    port: 3306
+    database: "knowledge_db"
+    user: "root"
+    password: "password"
+
+# 缓存配置
+cache:
+  enabled: true
+  backend: "redis"  # redis, memory
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    ttl: 3600  # 1小时
+  memory:
+    max_size: 1000
+    ttl: 1800  # 30分钟
+
+# 安全配置
+security:
+  enable_auth: false
+  api_key: "your-secret-api-key-here"
+  cors:
+    enabled: true
+    origins: ["http://localhost:3000", "http://localhost:8000"]
+    methods: ["GET", "POST", "PUT", "DELETE"]
+    headers: ["*"]
+
+# 日志配置
+logging:
+  level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "./logs/app.log"
+  max_size: 10485760  # 10MB
+  backup_count: 5
+
+# 性能配置
+performance:
+  workers: 4
+  max_connections: 100
+  timeout: 30
+  keepalive: 5
+
+# 监控配置
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: false
+    port: 9090
+  health_check:
+    enabled: true
+    interval: 60

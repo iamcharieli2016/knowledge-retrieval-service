@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # 后端服务
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: knowledge-retrieval-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+      - ./data:/app/data
+      - ./config.yaml:/app/config.yaml
+    environment:
+      - PYTHONUNBUFFERED=1
+      - SERVICE_HOST=0.0.0.0
+      - SERVICE_PORT=8000
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - knowledge-net
+    depends_on:
+      - redis
+    restart: unless-stopped
+
+  # 前端服务
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: knowledge-retrieval-frontend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    networks:
+      - knowledge-net
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  # Redis 缓存 (可选)
+  redis:
+    image: redis:7-alpine
+    container_name: knowledge-retrieval-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - knowledge-net
+    restart: unless-stopped
+
+networks:
+  knowledge-net:
+    driver: bridge
+
+volumes:
+  redis-data:

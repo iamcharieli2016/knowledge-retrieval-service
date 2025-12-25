@@ -1,0 +1,31 @@
+# Web Framework
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.4.0
+pydantic-settings>=2.0.0
+
+# File Processing
+python-multipart>=0.0.6
+aiofiles>=23.0.0
+Pillow>=10.0.0
+PyPDF2>=3.0.0
+python-docx>=1.0.0
+pytesseract>=0.3.10
+easyocr>=1.7.0
+openai-whisper>=20231117  # 音频转文字
+
+# Machine Learning & Embeddings
+torch>=2.0.0
+transformers>=4.30.0
+sentence-transformers>=2.2.0
+
+# Vector Databases
+chromadb>=0.4.0
+
+# Utilities
+python-dotenv>=1.0.0
+pyyaml>=6.0.0
+httpx>=0.25.0
+
+# Monitoring & Logging
+python-json-logger>=2.0.0

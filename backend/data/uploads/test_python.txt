@@ -1,0 +1,19 @@
+Python编程教程
+
+Python是一种高级编程语言，广泛用于数据分析、机器学习和Web开发。
+
+## 基础语法
+
+变量定义：
+```python
+name = "Python"
+version = 3.11
+```
+
+## 数据分析
+
+使用pandas和numpy进行数据处理。
+
+## 机器学习
+
+使用scikit-learn和TensorFlow构建模型。

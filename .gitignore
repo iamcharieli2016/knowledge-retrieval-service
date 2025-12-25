@@ -1,0 +1,24 @@
+# Python虚拟环境（核心：排除整个venv目录）
+backend/venv/
+venv/
+.env/
+.venv/
+
+# 大动态库文件（单独排除，双重保险）
+*.dylib
+*.so
+*.pyd
+*.dll
+
+# Python通用忽略项
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Mac系统文件
+.DS_Store
+*.swp
+
+# 日志/缓存
+*.log
+.cache/
